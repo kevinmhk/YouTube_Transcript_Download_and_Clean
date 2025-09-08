@@ -26,6 +26,7 @@ try:
     # Write to markdown file
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(f"# Transcript for video ID: {video_id}\n\n")
+        f.write(f"URL: https://www.youtube.com/watch?v={video_id}\n\n")
         f.write(processed_transcript)
 
     # Output full path to console
