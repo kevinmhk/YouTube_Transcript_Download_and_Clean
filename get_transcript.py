@@ -3,17 +3,36 @@ import datetime
 import os
 import sys
 
+language = None
+language_provided = False
+
 if len(sys.argv) > 1:
     video_id = sys.argv[1]
+    if len(sys.argv) > 2:
+        language = sys.argv[2]
+        language_provided = True
 else:
-    video_id = input("Please enter the YouTube video ID: ") 
+    video_id = input("Please enter the YouTube video ID: ")
+    language_input = input("Please enter the transcript language (default: en): ").strip()
+    if language_input:
+        language = language_input
+        language_provided = True
+    else:
+        language = "en"
 
 try:
-    transcript_list = YouTubeTranscriptApi().fetch(video_id)
-    full_transcript = " ".join([item.text for item in transcript_list])
-    
-    # Insert a newline after each full stop
-    processed_transcript = full_transcript.replace('. ', '.\n\n')
+    if language_provided:
+        transcript_list = YouTubeTranscriptApi().fetch(video_id, languages=[language])
+    else:
+        transcript_list = YouTubeTranscriptApi().fetch(video_id)
+
+    joiner = "\n\n" if language_provided and language.lower() != "en" else " "
+    full_transcript = joiner.join(item.text for item in transcript_list)
+
+    if language_provided and language.lower() != "en":
+        processed_transcript = full_transcript
+    else:
+        processed_transcript = full_transcript.replace('. ', '.\n\n')
 
     # Generate filename
     now = datetime.datetime.now()
